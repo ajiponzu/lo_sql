@@ -1,0 +1,10 @@
+version: '3'
+services:
+  db:
+    image: mysql:8.0
+    volumes:
+      - db-volume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+volumes:
+  db-volume:
