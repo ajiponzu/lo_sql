@@ -12,13 +12,16 @@ struct TableInf {
 }
 
 #[tauri::command]
-pub async fn greet(name: &str, pool: State<'_, MySqlPool>) -> Result<String, String> {
+pub async fn greet(db_name: &str, pool: State<'_, MySqlPool>) -> Result<String, String> {
     let user = "root";
     let password = "password";
     let host = "127.0.0.1";
     let port = "3306";
 
-    let database_url = format!("mysql://{}:{}@{}:{}/{}", user, password, host, port, name);
+    let database_url = format!(
+        "mysql://{}:{}@{}:{}/{}",
+        user, password, host, port, db_name
+    );
 
     let pool_new = match db::get_new_pool::<MySql>(&database_url).await {
         Some(pool_new) => pool_new,
@@ -57,5 +60,21 @@ pub async fn greet2(name: &str, pool: State<'_, MySqlPool>) -> Result<String, St
     match table_infs {
         Ok(inf) => Ok(format!("{:?}", inf)),
         Err(e) => Err(format!("sql_execute_error: {}", e.to_string())),
+    }
+}
+
+#[tauri::command]
+pub async fn show_mysql_tables(
+    db_name: &str,
+    pool: State<'_, MySqlPool>,
+) -> Result<String, String> {
+    let pool = match get_mysql_pool(pool) {
+        Some(pool) => pool,
+        None => return Err("failed getting mysql pool".to_string()),
+    };
+
+    match db::get_mysql_table_names(&pool, db_name).await {
+        Some(table_names) => Ok(table_names),
+        None => Err("failed getting table names".to_string()),
     }
 }
