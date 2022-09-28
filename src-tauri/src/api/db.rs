@@ -40,7 +40,7 @@ pub fn result_to_jsonstr<T: serde::Serialize>(data: &Vec<T>) -> String {
 
 #[derive(sqlx::FromRow, Debug, serde::Serialize)]
 struct TableName {
-    _name: String,
+    _name: Option<String>,
 }
 
 pub async fn get_mysql_table_names(pool: &Pool<MySql>, db_name: &str) -> Option<String> {
@@ -53,6 +53,34 @@ pub async fn get_mysql_table_names(pool: &Pool<MySql>, db_name: &str) -> Option<
 
     match table_names {
         Ok(names) => Some(result_to_jsonstr(&names)),
+        Err(_e) => None,
+    }
+}
+
+#[derive(sqlx::FromRow, Debug, serde::Serialize)]
+struct TableDetail {
+    _engine: Option<String>,
+    _rows: Option<u64>,
+    _size: Option<u64>,
+    _created_time: chrono::DateTime<chrono::Local>,
+    _updated_time: Option<chrono::NaiveDateTime>,
+}
+
+pub async fn get_mysql_table_details(
+    pool: &Pool<MySql>,
+    db_name: &str,
+    table_name: &str,
+) -> Option<String> {
+    let table_details = sqlx::query_as::<_, TableDetail>(
+        "SELECT engine as _engine, table_rows as _rows, data_length as _size, create_time as _created_time, update_time as _updated_time FROM information_schema.tables WHERE table_schema = ? and table_name = ?",
+    )
+    .bind::<String>(db_name.to_string())
+    .bind::<String>(table_name.to_string())
+    .fetch_all(pool)
+    .await;
+
+    match table_details {
+        Ok(details) => Some(result_to_jsonstr(&details)),
         Err(_e) => None,
     }
 }

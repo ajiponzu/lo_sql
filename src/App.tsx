@@ -6,13 +6,16 @@ import "./App.css";
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
   const [dbName, setDbName] = useState("");
+  const [tableName, setTableName] = useState("");
 
   async function greet() {
     setGreetMsg(await invoke("greet", { dbName }));
   }
 
   async function test() {
-    setGreetMsg(await invoke("show_mysql_tables", { dbName }));
+    setGreetMsg(
+      await invoke("show_mysql_table_details", { dbName, tableName })
+    );
   }
 
   return (
@@ -52,7 +55,7 @@ function App() {
         <div>
           <input
             id="greet-input"
-            onChange={(e) => setDbName(e.currentTarget.value)}
+            onChange={(e) => setTableName(e.currentTarget.value)}
             placeholder="Enter a name..."
           />
           <button type="button" onClick={() => test()}>

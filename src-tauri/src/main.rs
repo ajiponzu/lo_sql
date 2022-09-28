@@ -12,7 +12,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             api::greet,
             api::greet2,
-            api::show_mysql_tables
+            api::show_mysql_tables,
+            api::show_mysql_table_details
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
