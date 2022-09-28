@@ -10,8 +10,7 @@ fn main() {
     tauri::Builder::default()
         .manage(api::MySqlPool(Mutex::new(None)))
         .invoke_handler(tauri::generate_handler![
-            api::greet,
-            api::greet2,
+            api::login,
             api::show_mysql_tables,
             api::show_mysql_table_details,
             api::show_mysql_column_details,

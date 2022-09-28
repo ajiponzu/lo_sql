@@ -1,4 +1,4 @@
-use sqlx::{pool, Database, MySql, Pool};
+use sqlx::{error::DatabaseError, pool, Database, MySql, Pool};
 use std::sync::Mutex;
 use tauri::State;
 
@@ -38,12 +38,19 @@ fn result_to_jsonstr<T: serde::Serialize>(data: &Vec<T>) -> String {
     }
 }
 
+fn get_db_error_message(db_error: Option<&dyn DatabaseError>) -> String {
+    match db_error {
+        Some(msg) => msg.message().to_string(),
+        None => "error_message: empty".to_string(),
+    }
+}
+
 #[derive(sqlx::FromRow, Debug, serde::Serialize)]
 struct TableName {
     _name: Option<String>,
 }
 
-pub async fn get_mysql_table_names(pool: &Pool<MySql>, db_name: &str) -> Option<String> {
+pub async fn get_mysql_table_names(pool: &Pool<MySql>, db_name: &str) -> Result<String, String> {
     let table_names = sqlx::query_as::<_, TableName>(
         "SELECT table_name as _name FROM information_schema.tables WHERE table_schema = ?",
     )
@@ -51,9 +58,9 @@ pub async fn get_mysql_table_names(pool: &Pool<MySql>, db_name: &str) -> Option<
     .fetch_all(pool)
     .await;
 
-    match table_names {
-        Ok(names) => Some(result_to_jsonstr(&names)),
-        Err(_e) => None,
+    match &table_names {
+        Ok(names) => Ok(result_to_jsonstr(names)),
+        Err(e) => Err(get_db_error_message(e.as_database_error())),
     }
 }
 
@@ -70,7 +77,7 @@ pub async fn get_mysql_table_details(
     pool: &Pool<MySql>,
     db_name: &str,
     table_name: &str,
-) -> Option<String> {
+) -> Result<String, String> {
     let table_details = sqlx::query_as::<_, TableDetail>(
         "SELECT engine as _engine, table_rows as _rows, data_length as _size, create_time as _created_time, update_time as _updated_time FROM information_schema.tables WHERE table_schema = ? and table_name = ?",
     )
@@ -79,9 +86,9 @@ pub async fn get_mysql_table_details(
     .fetch_all(pool)
     .await;
 
-    match table_details {
-        Ok(details) => Some(result_to_jsonstr(&details)),
-        Err(_e) => None,
+    match &table_details {
+        Ok(details) => Ok(result_to_jsonstr(details)),
+        Err(e) => Err(get_db_error_message(e.as_database_error())),
     }
 }
 
@@ -100,7 +107,7 @@ pub async fn get_mysql_column_details(
     pool: &Pool<MySql>,
     db_name: &str,
     table_name: &str,
-) -> Option<String> {
+) -> Result<String, String> {
     let column_details = sqlx::query_as::<_, ColumnDetail>(
         "SELECT column_name as _name, is_nullable as _nullable, character_maximum_length as _char_max_len, numeric_precision as _num_precision, column_type as _type, column_key as _key_prop, extra as _extra FROM information_schema.columns WHERE table_schema = ? and table_name = ?",
     )
@@ -109,9 +116,9 @@ pub async fn get_mysql_column_details(
     .fetch_all(pool)
     .await;
 
-    match column_details {
-        Ok(details) => Some(result_to_jsonstr(&details)),
-        Err(_e) => None,
+    match &column_details {
+        Ok(details) => Ok(result_to_jsonstr(details)),
+        Err(e) => Err(get_db_error_message(e.as_database_error())),
     }
 }
 
@@ -125,7 +132,7 @@ pub async fn get_mysql_table_data(
     db_name: &str,
     table_name: &str,
     column_names: Vec<&str>,
-) -> Option<String> {
+) -> Result<String, String> {
     let mut concat_arg = String::new();
     for column_name in column_names {
         let mut add_name = format!("'{0}: ', IFNULL({0}, 'null')", column_name);
@@ -142,8 +149,8 @@ pub async fn get_mysql_table_data(
     );
     let table_data_list = sqlx::query_as::<_, TableData>(&sql).fetch_all(pool).await;
 
-    match table_data_list {
-        Ok(data_list) => Some(result_to_jsonstr(&data_list)),
-        Err(_e) => None,
+    match &table_data_list {
+        Ok(data_list) => Ok(result_to_jsonstr(data_list)),
+        Err(e) => Err(get_db_error_message(e.as_database_error())),
     }
 }
