@@ -84,3 +84,33 @@ pub async fn get_mysql_table_details(
         Err(_e) => None,
     }
 }
+
+#[derive(sqlx::FromRow, Debug, serde::Serialize)]
+struct ColumnDetail {
+    _name: Option<String>,
+    _nullable: String,
+    _char_max_len: Option<i64>,
+    _num_precision: Option<u64>,
+    _type: String,
+    _key_prop: String, // essentially, this is enum.. but, string is only allowable.
+    _extra: Option<String>,
+}
+
+pub async fn get_mysql_column_details(
+    pool: &Pool<MySql>,
+    db_name: &str,
+    table_name: &str,
+) -> Option<String> {
+    let column_details = sqlx::query_as::<_, ColumnDetail>(
+        "SELECT column_name as _name, is_nullable as _nullable, character_maximum_length as _char_max_len, numeric_precision as _num_precision, column_type as _type, column_key as _key_prop, extra as _extra FROM information_schema.columns WHERE table_schema = ? and table_name = ?",
+    )
+    .bind::<String>(db_name.to_string())
+    .bind::<String>(table_name.to_string())
+    .fetch_all(pool)
+    .await;
+
+    match column_details {
+        Ok(details) => Some(result_to_jsonstr(&details)),
+        Err(_e) => None,
+    }
+}

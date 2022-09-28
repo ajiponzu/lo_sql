@@ -14,7 +14,7 @@ function App() {
 
   async function test() {
     setGreetMsg(
-      await invoke("show_mysql_table_details", { dbName, tableName })
+      await invoke("show_mysql_column_details", { dbName, tableName })
     );
   }
 

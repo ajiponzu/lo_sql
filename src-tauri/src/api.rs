@@ -92,6 +92,23 @@ pub async fn show_mysql_table_details(
 
     match db::get_mysql_table_details(&pool, db_name, table_name).await {
         Some(table_details) => Ok(table_details),
-        None => Err("failed getting table names".to_string()),
+        None => Err("failed getting table details".to_string()),
+    }
+}
+
+#[tauri::command]
+pub async fn show_mysql_column_details(
+    db_name: &str,
+    table_name: &str,
+    pool: State<'_, MySqlPool>,
+) -> Result<String, String> {
+    let pool = match get_mysql_pool(pool) {
+        Some(pool) => pool,
+        None => return Err("failed getting mysql pool".to_string()),
+    };
+
+    match db::get_mysql_column_details(&pool, db_name, table_name).await {
+        Some(table_details) => Ok(table_details),
+        None => Err("failed getting column details".to_string()),
     }
 }
