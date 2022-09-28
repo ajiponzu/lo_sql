@@ -30,7 +30,7 @@ pub fn get_mysql_pool(pool: State<'_, MySqlPool>) -> Option<Pool<MySql>> {
     }
 }
 
-pub fn result_to_jsonstr<T: serde::Serialize>(data: &Vec<T>) -> String {
+fn result_to_jsonstr<T: serde::Serialize>(data: &Vec<T>) -> String {
     let ret = serde_json::to_string(data);
     match ret {
         Ok(json_str) => json_str,
@@ -111,6 +111,39 @@ pub async fn get_mysql_column_details(
 
     match column_details {
         Ok(details) => Some(result_to_jsonstr(&details)),
+        Err(_e) => None,
+    }
+}
+
+#[derive(sqlx::FromRow, Debug, serde::Serialize)]
+struct TableData {
+    _data: Option<String>,
+}
+
+pub async fn get_mysql_table_data(
+    pool: &Pool<MySql>,
+    db_name: &str,
+    table_name: &str,
+    column_names: Vec<&str>,
+) -> Option<String> {
+    let mut concat_arg = String::new();
+    for column_name in column_names {
+        let mut add_name = format!("'{0}: ', IFNULL({0}, 'null')", column_name);
+        add_name = if &concat_arg == "" {
+            add_name
+        } else {
+            format!(", ',', {}", &add_name)
+        };
+        concat_arg += &add_name;
+    }
+    let sql = format!(
+        "SELECT CONCAT({}) as _data from {}.{}",
+        concat_arg, db_name, table_name
+    );
+    let table_data_list = sqlx::query_as::<_, TableData>(&sql).fetch_all(pool).await;
+
+    match table_data_list {
+        Ok(data_list) => Some(result_to_jsonstr(&data_list)),
         Err(_e) => None,
     }
 }

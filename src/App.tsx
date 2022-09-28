@@ -12,9 +12,10 @@ function App() {
     setGreetMsg(await invoke("greet", { dbName }));
   }
 
+  const columnNames: string[] = ["id", "pairing_id", "player_id", "goal_time"];
   async function test() {
     setGreetMsg(
-      await invoke("show_mysql_column_details", { dbName, tableName })
+      await invoke("show_mysql_table_data", { dbName, tableName, columnNames })
     );
   }
 

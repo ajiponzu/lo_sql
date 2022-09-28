@@ -14,7 +14,8 @@ fn main() {
             api::greet2,
             api::show_mysql_tables,
             api::show_mysql_table_details,
-            api::show_mysql_column_details
+            api::show_mysql_column_details,
+            api::show_mysql_table_data,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
