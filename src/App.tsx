@@ -9,14 +9,20 @@ function App() {
   const [tableName, setTableName] = useState("");
 
   async function greet() {
-    setGreetMsg(await invoke("greet", { dbName }));
+    setGreetMsg(await invoke("login", { dbName }));
   }
 
   const columnNames: string[] = ["id", "pairing_id", "player_id", "goal_time"];
   async function test() {
-    setGreetMsg(
-      await invoke("show_mysql_table_data", { dbName, tableName, columnNames })
-    );
+    // @ts-ignore : in tauri, this code is correct.
+    await invoke("show_mysql_table_data", {
+      dbName,
+      tableName,
+      columnNames,
+    })
+      // @ts-ignore
+      .then((ret) => setGreetMsg(ret))
+      .catch((ret) => console.log(ret));
   }
 
   return (
