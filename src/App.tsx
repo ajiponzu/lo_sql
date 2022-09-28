@@ -5,10 +5,18 @@ import "./App.css";
 
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [dbName, setDbName] = useState("");
+  const [tableName, setTableName] = useState("");
 
   async function greet() {
-    setGreetMsg(await invoke("greet", { name }));
+    setGreetMsg(await invoke("greet", { dbName }));
+  }
+
+  const columnNames: string[] = ["id", "pairing_id", "player_id", "goal_time"];
+  async function test() {
+    setGreetMsg(
+      await invoke("show_mysql_table_data", { dbName, tableName, columnNames })
+    );
   }
 
   return (
@@ -36,11 +44,23 @@ function App() {
         <div>
           <input
             id="greet-input"
-            onChange={(e) => setName(e.currentTarget.value)}
+            onChange={(e) => setDbName(e.currentTarget.value)}
             placeholder="Enter a name..."
           />
           <button type="button" onClick={() => greet()}>
             Greet
+          </button>
+        </div>
+      </div>
+      <div className="row">
+        <div>
+          <input
+            id="greet-input"
+            onChange={(e) => setTableName(e.currentTarget.value)}
+            placeholder="Enter a name..."
+          />
+          <button type="button" onClick={() => test()}>
+            Test
           </button>
         </div>
       </div>
