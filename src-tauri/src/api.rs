@@ -7,15 +7,16 @@ use tauri::State;
 use self::db::get_mysql_pool;
 
 #[tauri::command(async)]
-pub async fn login(db_name: &str, pool: State<'_, MySqlPool>) -> Result<String, String> {
-    let user = "root";
-    let password = "password";
-    let host = "127.0.0.1";
-    let port = "3306";
-
+pub async fn login(
+    user_name: &str,
+    password: &str,
+    port: &str,
+    db_name: &str,
+    pool: State<'_, MySqlPool>,
+) -> Result<String, String> {
     let database_url = format!(
         "mysql://{}:{}@{}:{}/{}",
-        user, password, host, port, db_name
+        user_name, password, "localhost", port, db_name
     );
 
     let pool_new = match db::get_new_pool::<MySql>(&database_url).await {
