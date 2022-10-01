@@ -19,17 +19,35 @@ const convertNameList = (json: Array<any>) => {
 };
 
 const TableNameTag = (props: { tableName: string }) => {
+  const dbName = useRecoilValue(dbNameState);
+  const setColumnNames = useSetRecoilState(columnNamesState);
   const setTableName = useSetRecoilState(tableNameState);
-  const navigateAtTag = useNavigate();
-
-  const selectTable = () => {
-    setTableName(props.tableName);
-    navigateAtTag(`details/${props.tableName}`);
-  };
+  const navigate = useNavigate();
 
   return (
     <div className="TableNameTag" id={props.tableName}>
-      <button onClick={selectTable}>{props.tableName}</button>
+      <button
+        onClick={async () => {
+          await invoke("show_mysql_columns", {
+            dbName: dbName,
+            tableName: props.tableName,
+          })
+            .then((ret) => {
+              setColumnNames(
+                convertNameList(JSON.parse(ret as string) as Array<string>)
+              );
+              console.log(ret);
+              setTableName(props.tableName);
+              navigate(`details/${props.tableName}`);
+            })
+            .catch((err) => {
+              window.alert(err);
+              navigate("/");
+            });
+        }}
+      >
+        {props.tableName}
+      </button>
     </div>
   );
 };
@@ -37,13 +55,12 @@ const TableNameTag = (props: { tableName: string }) => {
 const SideView = () => {
   const dbName = useRecoilValue(dbNameState);
   const [tableNames, setTableNames] = useRecoilState(tableNamesState);
-  const columnNames = useSetRecoilState(columnNamesState);
   const reloadFlag = useRecoilValue(reloadFlagState);
   const navigate = useNavigate();
 
   useEffect(() => {
     const getTableNames = async () => {
-      await invoke("show_mysql_tables", { dbName })
+      await invoke("show_mysql_tables", { dbName: dbName })
         .then((ret) =>
           setTableNames(
             convertNameList(JSON.parse(ret as string) as Array<string>)
@@ -60,7 +77,7 @@ const SideView = () => {
   let jsxTableTags: Array<JSX.Element> = [];
   tableNames.forEach((item) => {
     jsxTableTags.push(
-      <div>
+      <div key={item}>
         <TableNameTag tableName={item} />
       </div>
     );

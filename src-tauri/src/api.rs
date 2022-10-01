@@ -53,6 +53,20 @@ pub async fn show_mysql_tables(
 }
 
 #[tauri::command(async)]
+pub async fn show_mysql_columns(
+    db_name: &str,
+    table_name: &str,
+    pool: State<'_, MySqlPool>,
+) -> Result<String, String> {
+    let pool = match get_mysql_pool(pool) {
+        Some(pool) => pool,
+        None => return Err("failed getting mysql pool".to_string()),
+    };
+
+    db::get_mysql_column_names(&pool, db_name, table_name).await
+}
+
+#[tauri::command(async)]
 pub async fn show_mysql_table_details(
     db_name: &str,
     table_name: &str,

@@ -65,6 +65,30 @@ pub async fn get_mysql_table_names(pool: &Pool<MySql>, db_name: &str) -> Result<
 }
 
 #[derive(sqlx::FromRow, Debug, serde::Serialize)]
+struct ColumnName {
+    _name: Option<String>,
+}
+
+pub async fn get_mysql_column_names(
+    pool: &Pool<MySql>,
+    db_name: &str,
+    table_name: &str,
+) -> Result<String, String> {
+    let column_names = sqlx::query_as::<_, ColumnName>(
+        "SELECT column_name as _name FROM information_schema.columns WHERE table_schema = ? and table_name = ?",
+    )
+    .bind::<String>(db_name.to_string())
+    .bind::<String>(table_name.to_string())
+    .fetch_all(pool)
+    .await;
+
+    match &column_names {
+        Ok(names) => Ok(result_to_jsonstr(names)),
+        Err(e) => Err(get_db_error_message(e.as_database_error())),
+    }
+}
+
+#[derive(sqlx::FromRow, Debug, serde::Serialize)]
 struct TableDetail {
     _engine: Option<String>,
     _rows: Option<u64>,

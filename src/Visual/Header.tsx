@@ -20,12 +20,20 @@ const Header = memo(() => {
           <br />
           Login
         </button>
-        <button onClick={() => navigate(`details/${tableName}`)}>
+        <button
+          onClick={() => {
+            if (tableName) navigate(`details/${tableName}`);
+          }}
+        >
           📑
           <br />
           Details
         </button>
-        <button onClick={() => navigate(`contents/${tableName}`)}>
+        <button
+          onClick={() => {
+            if (tableName) navigate(`contents/${tableName}`);
+          }}
+        >
           📖
           <br />
           Data
