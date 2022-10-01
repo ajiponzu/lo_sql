@@ -1,12 +1,8 @@
-import { useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-
-const ErrorField = (props: { msg: string }) => {
-  const errorMsg = props.msg === "" ? "" : `Error: ${props.msg}`;
-  return <h2 className="errorMsg">{errorMsg}</h2>;
-};
+import { useSetRecoilState } from "recoil";
+import { dbNameState } from "./RecoilStates";
 
 type Input = {
   userName: string;
@@ -16,7 +12,7 @@ type Input = {
 };
 
 const Login = () => {
-  const [errorMsg, setErrorMsg] = useState("");
+  const setDBName = useSetRecoilState(dbNameState);
   const navigate = useNavigate();
 
   const {
@@ -26,14 +22,20 @@ const Login = () => {
   } = useForm<Input>();
 
   const onSubmit = async (data: Input) => {
-    const userName = data.userName;
-    const password = data.password;
-    const port = data.port;
-    const dbName = data.dbName;
-
-    await invoke("login", { userName, password, port, dbName })
-      .then(() => navigate(`/visual/${dbName}`))
-      .catch((ret) => setErrorMsg(ret));
+    await invoke("login", {
+      userName: data.userName,
+      password: data.password,
+      port: data.port,
+      dbName: data.dbName,
+    })
+      .then(() => {
+        setDBName(data.dbName);
+        navigate("/visual");
+      })
+      .catch((err) => {
+        window.alert(err);
+        navigate("/");
+      });
   };
 
   return (
@@ -76,11 +78,8 @@ const Login = () => {
             })}
           />
           <p>{errors.dbName?.message}</p>
-          <input type="submit" />
+          <input type="submit" id="submit-button" />
         </form>
-      </div>
-      <div className="row">
-        <ErrorField msg={errorMsg} />
       </div>
     </div>
   );

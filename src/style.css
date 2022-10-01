@@ -98,6 +98,9 @@ button {
   button {
     color: #ffffff;
     background-color: #0f0f0f98;
+  }
+
+  #submit-button {
     cursor: pointer;
   }
 }
