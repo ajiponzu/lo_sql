@@ -23,9 +23,14 @@
 
 .MainLayout .side {
   min-width: 200px;
-  min-height: 200px;
+  min-height: 350px;
   align-content: center;
   justify-content: space-around;
+  background-color: dimgray;
+}
+
+.MainLayout .pad {
+  width: 10px;
 }
 
 .MainLayout .main {
@@ -40,14 +45,13 @@
 
 .SideView {
   background-color: lightslategray;
-  border-radius: 20px;
-  min-width: 200px;
-  min-height: 200px;
+  min-height: 350px;
   position: sticky;
 }
 
 .MainView {
   padding-top: 15px;
   border-radius: 10px;
-  background-color: dimgray;
+  min-height: 350px;
+  background-color: lightslategray;
 }
