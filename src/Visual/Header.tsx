@@ -10,38 +10,27 @@ const Header = memo(() => {
   const setReloadFlag = useSetRecoilState(reloadFlagState);
   const navigate = useNavigate();
 
-  const viewLogin = useCallback(() => {
-    navigate("/");
-  }, []);
-  const viewDetails = useCallback(() => {
-    navigate(`details/${tableName}`);
-  }, []);
-  const viewsContents = useCallback(() => {
-    navigate(`contents/${tableName}`);
-  }, []);
-  const reload = useCallback(() => {
-    setReloadFlag(!reloadFlag);
-  }, []);
+  console.log(tableName);
 
   return (
     <div className="VisualHeader">
       <div className="buttons">
-        <button onClick={viewLogin}>
+        <button onClick={() => navigate("/")}>
           🗝️
           <br />
           Login
         </button>
-        <button onClick={viewDetails}>
+        <button onClick={() => navigate(`details/${tableName}`)}>
           📑
           <br />
           Details
         </button>
-        <button onClick={viewsContents}>
+        <button onClick={() => navigate(`contents/${tableName}`)}>
           📖
           <br />
           Data
         </button>
-        <button onClick={reload}>
+        <button onClick={() => setReloadFlag(!reloadFlag)}>
           🔄
           <br />
           Reload

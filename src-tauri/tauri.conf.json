@@ -55,10 +55,12 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
         "resizable": true,
         "title": "lo_sql",
         "width": 800,
+        "height": 600,
+        "minWidth": 800,
+        "minHeight": 600,
         "transparent": true
       }
     ]
