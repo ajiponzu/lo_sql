@@ -12,7 +12,7 @@ export const dbNameState = atom({
 
 export const tableNameState = atom({
   key: "tableNameState",
-  default: "goals" as string,
+  default: "" as string,
 });
 
 export const tableNamesState = atom({

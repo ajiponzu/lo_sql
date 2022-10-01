@@ -1,5 +1,6 @@
 .VisualHeader {
-  background-color: dimgray;
+  border-radius: 10px;
+  background-color: lightslategray;
 }
 .VisualHeader .buttons {
   align-content: center;
@@ -12,4 +13,58 @@
   text-align: center;
   width: 80px;
   height: 60px;
+}
+
+.MainLayout {
+  padding-top: 15px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.MainLayout .side {
+  min-width: 200px;
+  min-height: 350px;
+  align-content: center;
+  justify-content: space-around;
+  background-color: dimgray;
+}
+
+.MainLayout .pad {
+  width: 10px;
+}
+
+.MainLayout .main {
+  flex: auto;
+}
+
+.TableNameTag button {
+  background-color: lightslategray;
+  border-radius: 0%;
+  min-width: 200px;
+}
+
+.SideView {
+  background-color: lightslategray;
+  min-height: 350px;
+  position: sticky;
+}
+
+.MainView {
+  padding-top: 15px;
+  border-radius: 10px;
+  min-height: 350px;
+  background-color: darkslategray;
+}
+
+.TableInfTable table {
+  color: cornsilk;
+}
+
+.TableInfTable th,
+td {
+  border: solid 1px;
+}
+
+.TableInfTable .ColumnNameRow {
+  color: aquamarine;
 }

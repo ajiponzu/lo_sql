@@ -12,6 +12,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             api::login,
             api::show_mysql_tables,
+            api::show_mysql_columns,
             api::show_mysql_table_details,
             api::show_mysql_column_details,
             api::show_mysql_table_data,

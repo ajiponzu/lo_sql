@@ -8,6 +8,7 @@ import Visual from "./Visual";
 import { RecoilRoot } from "recoil";
 import Details from "./Visual/Details";
 import Contents from "./Visual/Contents";
+import TableInf from "./Visual/TableInf";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
@@ -18,6 +19,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           <Route path="/visual" element={<Visual />}>
             <Route path="details/:tableName" element={<Details />} />
             <Route path="contents/:tableName" element={<Contents />} />
+            <Route path="table_inf/:tableName" element={<TableInf />} />
           </Route>
         </Routes>
       </BrowserRouter>
