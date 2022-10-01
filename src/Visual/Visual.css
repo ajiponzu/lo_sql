@@ -1,0 +1,15 @@
+.VisualHeader {
+  background-color: dimgray;
+}
+.VisualHeader .buttons {
+  align-content: center;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  display: flex;
+  justify-content: center;
+}
+.VisualHeader button {
+  text-align: center;
+  width: 80px;
+  height: 60px;
+}
