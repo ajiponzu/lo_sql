@@ -1,16 +1,12 @@
-import { memo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { dbNameState, reloadFlagState, tableNameState } from "../RecoilStates";
+import { reloadFlagState, tableNameState } from "../RecoilStates";
 
-const Header = memo(() => {
+const Header = () => {
   const [tableName, _] = useRecoilState(tableNameState);
-  const dbName = useRecoilValue(dbNameState);
   const reloadFlag = useRecoilValue(reloadFlagState);
   const setReloadFlag = useSetRecoilState(reloadFlagState);
   const navigate = useNavigate();
-
-  console.log(tableName);
 
   return (
     <div className="VisualHeader">
@@ -46,6 +42,6 @@ const Header = memo(() => {
       </div>
     </div>
   );
-});
+};
 
 export default Header;

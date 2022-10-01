@@ -53,5 +53,18 @@
   padding-top: 15px;
   border-radius: 10px;
   min-height: 350px;
-  background-color: lightslategray;
+  background-color: darkslategray;
+}
+
+.TableInfTable table {
+  color: cornsilk;
+}
+
+.TableInfTable th,
+td {
+  border: solid 1px;
+}
+
+.TableInfTable .ColumnNameRow {
+  color: aquamarine;
 }

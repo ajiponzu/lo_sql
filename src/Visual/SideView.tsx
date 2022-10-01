@@ -36,9 +36,8 @@ const TableNameTag = (props: { tableName: string }) => {
               setColumnNames(
                 convertNameList(JSON.parse(ret as string) as Array<string>)
               );
-              console.log(ret);
               setTableName(props.tableName);
-              navigate(`details/${props.tableName}`);
+              navigate(`table_inf/${props.tableName}`);
             })
             .catch((err) => {
               window.alert(err);
