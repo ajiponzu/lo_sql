@@ -4,8 +4,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { columnNamesState, dbNameState } from "../RecoilStates";
 
-const convertLineToJSON = (json: Array<any>) => {};
-
 const convertTableJSX = (
   json: Array<any>,
   tableName: string,
