@@ -1,7 +1,7 @@
 import { invoke } from "@tauri-apps/api/tauri";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import {
   tableNamesState,
   dbNameState,
@@ -53,7 +53,8 @@ const TableNameTag = (props: { tableName: string }) => {
 
 const SideView = () => {
   const dbName = useRecoilValue(dbNameState);
-  const [tableNames, setTableNames] = useRecoilState(tableNamesState);
+  const tableNames = useRecoilValue(tableNamesState);
+  const setTableNames = useSetRecoilState(tableNamesState);
   const reloadFlag = useRecoilValue(reloadFlagState);
   const navigate = useNavigate();
 
