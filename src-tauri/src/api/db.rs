@@ -159,7 +159,10 @@ pub async fn get_mysql_table_data(
 ) -> Result<String, String> {
     let mut concat_arg = String::new();
     for column_name in column_names {
-        let mut add_name = format!("'{0}: ', IFNULL({0}, 'null')", column_name);
+        let mut add_name = format!(
+            "'\"{0}\": ', '\"', IFNULL(CAST(`{0}` AS CHAR(1000) CHARACTER SET utf8), 'undefined data'), '\"'",
+            column_name
+        );
         add_name = if &concat_arg == "" {
             add_name
         } else {
@@ -168,10 +171,12 @@ pub async fn get_mysql_table_data(
         concat_arg += &add_name;
     }
     let sql = format!(
-        "SELECT CONCAT({}) as _data from {}.{}",
-        concat_arg, db_name, table_name
+        "SELECT CONCAT('{}', {}, \'{}\') as _data from {}.{}",
+        "{\"_json\": {", concat_arg, "}}", db_name, table_name
     );
     let table_data_list = sqlx::query_as::<_, TableData>(&sql).fetch_all(pool).await;
+
+    println!("{:?}", &table_data_list);
 
     match &table_data_list {
         Ok(data_list) => Ok(result_to_jsonstr(data_list)),
