@@ -26,7 +26,8 @@
   min-height: 350px;
   align-content: center;
   justify-content: space-around;
-  background-color: dimgray;
+  background-color: lightslategray;
+  height: 70vh;
 }
 
 .MainLayout .pad {
@@ -35,18 +36,21 @@
 
 .MainLayout .main {
   flex: auto;
+  background-color: darkslategray;
+  height: 70vh;
 }
 
 .TableNameTag button {
   background-color: lightslategray;
-  border-radius: 0%;
-  min-width: 200px;
+  border-radius: 0px;
+  width: 100%;
 }
 
 .SideView {
   background-color: lightslategray;
   min-height: 350px;
-  position: sticky;
+  display: inline-block;
+  padding: 0;
 }
 
 .MainView {
@@ -54,17 +58,23 @@
   border-radius: 10px;
   min-height: 350px;
   background-color: darkslategray;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
 }
 
-.TableInfTable table {
+.MainView table {
   color: cornsilk;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
 }
 
-.TableInfTable th,
+.MainView th,
 td {
   border: solid 1px;
 }
 
-.TableInfTable .ColumnNameRow {
+.MainView .ColumnNameRow {
   color: aquamarine;
 }

@@ -6,7 +6,7 @@ import { dbNameState } from "../RecoilStates";
 
 const convertTableJSX = (json: Array<any>, tableName: string) => {
   return (
-    <div className="TableInfTable">
+    <div className="ColumnDetailTable">
       <h2>Table: {tableName}</h2>
       <table>
         <thead>
