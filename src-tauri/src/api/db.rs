@@ -7,7 +7,7 @@ pub struct MySqlPool(pub Mutex<Option<Pool<MySql>>>);
 pub async fn get_new_pool<DB: Database>(db_url: &str) -> Option<Pool<DB>> {
     let pool_ret = pool::PoolOptions::<DB>::new()
         .max_connections(20)
-        .connect(&db_url)
+        .connect(db_url)
         .await;
 
     match pool_ret {
@@ -24,10 +24,7 @@ pub fn get_mysql_pool(pool: State<'_, MySqlPool>) -> Option<Pool<MySql>> {
         }
     };
 
-    match guard.as_ref() {
-        Some(pool) => Some(pool.clone()),
-        None => None,
-    }
+    guard.as_ref().cloned()
 }
 
 fn result_to_jsonstr<T: serde::Serialize>(data: &Vec<T>) -> String {
@@ -163,7 +160,7 @@ pub async fn get_mysql_table_data(
             "'\"{0}\": ', '\"', IFNULL(CAST(`{0}` AS CHAR(1000) CHARACTER SET utf8), 'undefined data'), '\"'",
             column_name
         );
-        add_name = if &concat_arg == "" {
+        add_name = if concat_arg.is_empty() {
             add_name
         } else {
             format!(", ',', {}", &add_name)
