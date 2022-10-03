@@ -19,20 +19,15 @@ pub async fn login(
         user_name, password, "localhost", port, db_name
     );
 
-    let pool_new = match db::get_new_pool::<MySql>(&database_url).await {
-        Some(pool_new) => pool_new,
-        None => {
-            return Err("connection failed.....".to_string());
-        }
-    };
+    let pool_new = db::get_new_pool::<MySql>(&database_url)
+        .await
+        .ok_or_else(|| "connection failed.....".to_string())?;
 
     {
-        let mut guard = match pool.0.lock() {
-            Ok(guard) => guard,
-            Err(e) => {
-                return Err(format!("{e}: connection failed....."));
-            }
-        };
+        let mut guard = pool
+            .0
+            .lock()
+            .map_err(|e| format!("{e}: connection failed....."))?;
         *guard = Some(pool_new);
     }
 
@@ -44,10 +39,7 @@ pub async fn show_mysql_tables(
     db_name: &str,
     pool: State<'_, MySqlPool>,
 ) -> Result<String, String> {
-    let pool = match get_mysql_pool(pool) {
-        Some(pool) => pool,
-        None => return Err("failed getting mysql pool".to_string()),
-    };
+    let pool = get_mysql_pool(pool).ok_or_else(|| "failed getting mysql pool".to_string())?;
 
     db::get_mysql_table_names(&pool, db_name).await
 }
@@ -58,10 +50,7 @@ pub async fn show_mysql_columns(
     table_name: &str,
     pool: State<'_, MySqlPool>,
 ) -> Result<String, String> {
-    let pool = match get_mysql_pool(pool) {
-        Some(pool) => pool,
-        None => return Err("failed getting mysql pool".to_string()),
-    };
+    let pool = get_mysql_pool(pool).ok_or_else(|| "failed getting mysql pool".to_string())?;
 
     db::get_mysql_column_names(&pool, db_name, table_name).await
 }
@@ -72,10 +61,7 @@ pub async fn show_mysql_table_details(
     table_name: &str,
     pool: State<'_, MySqlPool>,
 ) -> Result<String, String> {
-    let pool = match get_mysql_pool(pool) {
-        Some(pool) => pool,
-        None => return Err("failed getting mysql pool".to_string()),
-    };
+    let pool = get_mysql_pool(pool).ok_or_else(|| "failed getting mysql pool".to_string())?;
 
     db::get_mysql_table_details(&pool, db_name, table_name).await
 }
@@ -86,10 +72,7 @@ pub async fn show_mysql_column_details(
     table_name: &str,
     pool: State<'_, MySqlPool>,
 ) -> Result<String, String> {
-    let pool = match get_mysql_pool(pool) {
-        Some(pool) => pool,
-        None => return Err("failed getting mysql pool".to_string()),
-    };
+    let pool = get_mysql_pool(pool).ok_or_else(|| "failed getting mysql pool".to_string())?;
 
     db::get_mysql_column_details(&pool, db_name, table_name).await
 }
@@ -101,10 +84,7 @@ pub async fn show_mysql_table_data(
     column_names: Vec<&str>,
     pool: State<'_, MySqlPool>,
 ) -> Result<String, String> {
-    let pool = match get_mysql_pool(pool) {
-        Some(pool) => pool,
-        None => return Err("failed getting mysql pool".to_string()),
-    };
+    let pool = get_mysql_pool(pool).ok_or_else(|| "failed getting mysql pool".to_string())?;
 
     db::get_mysql_table_data(&pool, db_name, table_name, column_names).await
 }

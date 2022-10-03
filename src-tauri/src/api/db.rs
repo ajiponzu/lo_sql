@@ -5,44 +5,26 @@ use tauri::State;
 pub struct MySqlPool(pub Mutex<Option<Pool<MySql>>>);
 
 pub async fn get_new_pool<DB: Database>(db_url: &str) -> Option<Pool<DB>> {
-    let pool_ret = pool::PoolOptions::<DB>::new()
+    pool::PoolOptions::<DB>::new()
         .max_connections(20)
-        .connect(&db_url)
-        .await;
-
-    match pool_ret {
-        Ok(pool) => Some(pool),
-        Err(_e) => None,
-    }
+        .connect(db_url)
+        .await
+        .ok()
 }
 
 pub fn get_mysql_pool(pool: State<'_, MySqlPool>) -> Option<Pool<MySql>> {
-    let guard = match pool.0.lock() {
-        Ok(guard) => guard,
-        Err(_e) => {
-            return None;
-        }
-    };
-
-    match guard.as_ref() {
-        Some(pool) => Some(pool.clone()),
-        None => None,
-    }
+    pool.0.lock().ok()?.as_ref().cloned()
 }
 
 fn result_to_jsonstr<T: serde::Serialize>(data: &Vec<T>) -> String {
-    let ret = serde_json::to_string(data);
-    match ret {
-        Ok(json_str) => json_str,
-        Err(_e) => "failed converting json format string.....".to_string(),
-    }
+    serde_json::to_string(data)
+        .unwrap_or_else(|_| "failed converting json format string.....".to_string())
 }
 
 fn get_db_error_message(db_error: Option<&dyn DatabaseError>) -> String {
-    match db_error {
-        Some(msg) => msg.message().to_string(),
-        None => "error_message: empty".to_string(),
-    }
+    db_error
+        .map(|msg| msg.message().to_string())
+        .unwrap_or_else(|| "error_message: empty".to_string())
 }
 
 #[derive(sqlx::FromRow, Debug, serde::Serialize)]
@@ -58,10 +40,9 @@ pub async fn get_mysql_table_names(pool: &Pool<MySql>, db_name: &str) -> Result<
     .fetch_all(pool)
     .await;
 
-    match &table_names {
-        Ok(names) => Ok(result_to_jsonstr(names)),
-        Err(e) => Err(get_db_error_message(e.as_database_error())),
-    }
+    table_names
+        .map(|names| result_to_jsonstr(&names))
+        .map_err(|e| get_db_error_message(e.as_database_error()))
 }
 
 #[derive(sqlx::FromRow, Debug, serde::Serialize)]
@@ -82,10 +63,9 @@ pub async fn get_mysql_column_names(
     .fetch_all(pool)
     .await;
 
-    match &column_names {
-        Ok(names) => Ok(result_to_jsonstr(names)),
-        Err(e) => Err(get_db_error_message(e.as_database_error())),
-    }
+    column_names
+        .map(|names| result_to_jsonstr(&names))
+        .map_err(|e| get_db_error_message(e.as_database_error()))
 }
 
 #[derive(sqlx::FromRow, Debug, serde::Serialize)]
@@ -110,10 +90,9 @@ pub async fn get_mysql_table_details(
     .fetch_all(pool)
     .await;
 
-    match &table_details {
-        Ok(details) => Ok(result_to_jsonstr(details)),
-        Err(e) => Err(get_db_error_message(e.as_database_error())),
-    }
+    table_details
+        .map(|details| result_to_jsonstr(&details))
+        .map_err(|e| get_db_error_message(e.as_database_error()))
 }
 
 #[derive(sqlx::FromRow, Debug, serde::Serialize)]
@@ -140,10 +119,9 @@ pub async fn get_mysql_column_details(
     .fetch_all(pool)
     .await;
 
-    match &column_details {
-        Ok(details) => Ok(result_to_jsonstr(details)),
-        Err(e) => Err(get_db_error_message(e.as_database_error())),
-    }
+    column_details
+        .map(|details| result_to_jsonstr(&details))
+        .map_err(|e| get_db_error_message(e.as_database_error()))
 }
 
 #[derive(sqlx::FromRow, Debug, serde::Serialize)]
@@ -163,7 +141,7 @@ pub async fn get_mysql_table_data(
             "'\"{0}\": ', '\"', IFNULL(CAST(`{0}` AS CHAR(1000) CHARACTER SET utf8), 'undefined data'), '\"'",
             column_name
         );
-        add_name = if &concat_arg == "" {
+        add_name = if concat_arg.is_empty() {
             add_name
         } else {
             format!(", ',', {}", &add_name)
@@ -178,8 +156,7 @@ pub async fn get_mysql_table_data(
 
     println!("{:?}", &table_data_list);
 
-    match &table_data_list {
-        Ok(data_list) => Ok(result_to_jsonstr(data_list)),
-        Err(e) => Err(get_db_error_message(e.as_database_error())),
-    }
+    table_data_list
+        .map(|data_list| result_to_jsonstr(&data_list))
+        .map_err(|e| get_db_error_message(e.as_database_error()))
 }
